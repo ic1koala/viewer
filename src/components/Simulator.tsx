@@ -31,17 +31,37 @@ export const Simulator: React.FC = () => {
   const entAngleRad = (entranceAngle * Math.PI) / 180;
 
   // 比反射輝度 RA の計算モデル
+  // ASTM D4956 公式最低値に準拠してキャリブレーション済み
+  // 参考基準: Type I (70), Type IV (360), Type XI (580) cd/lx/m² @α=0.2°, β=-4°
   const getRetroreflectivity = (type: SheetType, alpha: number, beta: number): number => {
     const alphaDeg = (alpha * 180) / Math.PI;
     const betaDeg = (beta * 180) / Math.PI;
     
     switch (type) {
-      case 'bead': // ガラスビーズ型 (低輝度、広角)
-        return Math.round(90 * Math.exp(-0.35 * Math.pow(alphaDeg, 1.8)) * Math.cos(beta) * (1 - Math.abs(betaDeg) / 90));
-      case 'prism': // プリズム型 (高輝度、やや狭角)
-        return Math.round(500 * Math.exp(-1.4 * Math.pow(alphaDeg, 1.5)) * Math.cos(beta * 1.2) * (1 - Math.abs(betaDeg) / 60));
-      case 'fullcube': // フルキューブプリズム型 (超高輝度、超広角)
-        return Math.round(900 * Math.exp(-0.8 * Math.pow(alphaDeg, 1.3)) * Math.cos(beta * 0.9) * (1 - Math.abs(betaDeg) / 80));
+      case 'bead': // ガラスビーズ型 (ASTM Type I 相当, 封入レンズ方式)
+        // 基準RA₀≈105, 減衰: exp(-3.0·α^1.6), β限界: ±50°
+        // 検証: α=0.2°/β=5°→~70, α=0.5°/β=5°→~34, α=1.0°/β=5°→~5
+        return Math.max(0, Math.round(
+          105 * Math.exp(-3.0 * Math.pow(alphaDeg, 1.6))
+          * Math.cos(beta)
+          * Math.max(0, 1 - Math.abs(betaDeg) / 50)
+        ));
+      case 'prism': // プリズム型 (ASTM Type IV 相当, マイクロプリズム方式)
+        // 基準RA₀≈470, 減衰: exp(-3.2·α^1.85), β限界: ±55°
+        // 検証: α=0.2°/β=5°→~363, α=0.5°/β=5°→~166, α=1.0°/β=5°→~17
+        return Math.max(0, Math.round(
+          470 * Math.exp(-3.2 * Math.pow(alphaDeg, 1.85))
+          * Math.cos(beta)
+          * Math.max(0, 1 - Math.abs(betaDeg) / 55)
+        ));
+      case 'fullcube': // フルキューブプリズム型 (ASTM Type XI 相当, 3M DG³等)
+        // 基準RA₀≈670, 減衰: exp(-1.64·α²), β限界: ±70°
+        // 検証: α=0.2°/β=5°→~580, α=0.5°/β=5°→~411, α=1.0°/β=5°→~120
+        return Math.max(0, Math.round(
+          670 * Math.exp(-1.64 * Math.pow(alphaDeg, 2.0))
+          * Math.cos(beta)
+          * Math.max(0, 1 - Math.abs(betaDeg) / 70)
+        ));
     }
   };
 
@@ -714,6 +734,12 @@ export const Simulator: React.FC = () => {
               <span className="metric-label">推定比反射輝度係数 (RA)</span>
               <span className="metric-value gold-text">
                 {currentRA} <span className="unit">cd/lx/m²</span>
+              </span>
+            </div>
+            <div className="result-metric astm-ref">
+              <span className="metric-label">ASTM D4956 基準最低値 (α=0.2°, β=-4°)</span>
+              <span className="metric-value" style={{fontSize: '0.8em', opacity: 0.7}}>
+                {selectedSheet === 'bead' ? 'Type I: 70' : selectedSheet === 'prism' ? 'Type IV: 360' : 'Type XI: 580'} cd/lx/m²
               </span>
             </div>
             
