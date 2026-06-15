@@ -51,6 +51,35 @@ export const Simulator: React.FC = () => {
 
   const currentRA = getRetroreflectivity(selectedSheet, obsAngleRad, entAngleRad);
 
+  // 視認性能判定と動的解説の定義
+  const getInspectionResult = () => {
+    if (obsAngleDeg > 1.2 || Math.abs(entranceAngle) >= 40) {
+      return {
+        status: 'ng' as const,
+        advice: '❌ 視認NG：反射光が極端に減衰し、ドライバーから標識は見えません。',
+        reason: obsAngleDeg > 1.2 
+          ? `【原因】観測角αが広すぎます（${obsAngleDeg.toFixed(2)}°）。車が標識に近づきすぎているか、大型車（トラック）のようにアイポイント（光源と目の垂直距離）が高いためです。反射光の「光錐（光のコーン）」の中心から目が完全に外れてしまっています。`
+          : `【原因】入射角βが大きすぎます（${Math.abs(entranceAngle)}°）。光の進入角度が急なため、プリズム内での全反射条件（臨界角）が崩れて光が背面に抜けているか、ガラスビーズの球面収差により裏面の反射膜へ焦点を結ばなくなっています。`
+      };
+    } else if (obsAngleDeg > 0.5 || Math.abs(entranceAngle) >= 20) {
+      return {
+        status: 'warn' as const,
+        advice: '⚠️ 注意：視認性が低下しています。車載ライトからの反射が弱く見えます。',
+        reason: obsAngleDeg > 0.5
+          ? `【原因】観測角αがやや広がっています（${obsAngleDeg.toFixed(2)}°）。ビーズ型や通常のプリズム型シートでは輝度の減衰が目立ちます。より高輝度かつ広角性に優れたフルキューブ型（3M DG³等）への変更を検討してください。`
+          : `【原因】入射角βがやや大きいです（${Math.abs(entranceAngle)}°）。標識が斜めを向いているため、反射効率が低下しています。大入射角（広角性）に特化したシート設計が求められます。`
+      };
+    } else {
+      return {
+        status: 'ok' as const,
+        advice: '✨ 良好：夜間でも極めて鮮明に標識を認識できる、最適な幾何条件です。',
+        reason: '【解説】観測角α（0.5°以下）および入射角β（20°未満）が十分に小さく、再帰反射の幾何光学条件（スネルの法則・全反射）が理想的に維持されています。最もエネルギーの強い反射光の中心部にドライバーの目が位置しています。'
+      };
+    }
+  };
+
+  const result = getInspectionResult();
+
   // マクロシミュレーション描画
   useEffect(() => {
     if (microMode) return; // ミクロモード時はマクロ描画をスキップ
@@ -89,9 +118,10 @@ export const Simulator: React.FC = () => {
     ctx.setLineDash([]); // リセット
 
     // スケール変換: 20m - 150m を キャンバスの 80px - 580px にマッピング
+    // 距離が短い(20m)ほど車は右側(標識に近い)、長い(150m)ほど左側(標識から遠い)になるようマッピング
     const minD = 20, maxD = 150;
     const minX = 80, maxX = 560;
-    const carX = minX + ((distance - minD) / (maxD - minD)) * (maxX - minX);
+    const carX = maxX - ((distance - minD) / (maxD - minD)) * (maxX - minX);
     const signX = 680; // 標識の位置 (固定)
     const signY = 140; // 標識の高さ (固定)
 
@@ -714,14 +744,35 @@ export const Simulator: React.FC = () => {
             
             {/* 簡易警告・アドバイス */}
             <div className="result-advice">
-              {obsAngleDeg > 2.0 ? (
-                <span className="warning-badge">⚠️ 警告: 観測角が広すぎます。反射光がドライバーに届きにくく、標識が暗く見えます。</span>
-              ) : Math.abs(entranceAngle) > 30 ? (
-                <span className="warning-badge">⚠️ 注意: 入射角が大きく斜めからの光です。広角特性の高いシートを選択してください。</span>
-              ) : (
-                <span className="ok-badge">✨ 良好: 夜間でも非常に高い視認性が確保される配置条件です。</span>
-              )}
+              <span className={`${result.status}-badge`}>{result.advice}</span>
+              <p className="result-reason-text">{result.reason}</p>
             </div>
+          </div>
+
+          {/* 新設：判定基準ガイド */}
+          <div className="advice-guide-box">
+            <h4>💡 視認判定の基準値とNG範囲</h4>
+            <p className="guide-intro">
+              再帰反射シートは入射光を光源へ「コーン状（光錐）」に戻すため、以下の角度が大きくなると反射光は急激に弱まります。
+            </p>
+            <ul className="guide-list">
+              <li>
+                <strong>観測角 (α) [ライトと目の高低差]</strong>:
+                <ul>
+                  <li><code>0.2° 〜 0.33° (12′〜20′)</code>: <strong>最適（最高輝度）</strong>。遠方走行時。</li>
+                  <li><code>0.5° (30′) 超</code>: <strong>注意</strong>。大型車や近距離で発生し、輝度が大幅に減衰。</li>
+                  <li><code>1.2° (72′) 超</code>: <strong>NG（視認不可）</strong>。光錐から目が完全に外れ、標識が暗黒化。</li>
+                </ul>
+              </li>
+              <li>
+                <strong>入射角 (β) [光の差し込む傾き]</strong>:
+                <ul>
+                  <li><code>0° 〜 15°</code>: <strong>良好</strong>。正面に近い反射。</li>
+                  <li><code>20° 〜 35°</code>: <strong>注意</strong>。カーブ等の斜め受光。広角性シートが必要。</li>
+                  <li><code>40° 以上</code>: <strong>NG（全反射の喪失）</strong>。アクリル臨界角を超えて光が透過漏れし反射不能。</li>
+                </ul>
+              </li>
+            </ul>
           </div>
         </div>
       </div>

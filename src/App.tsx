@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { Simulator } from './components/Simulator';
 import { Manufacturers } from './components/Manufacturers';
+import { SensorReflector } from './components/SensorReflector';
 import { Glossary } from './components/Glossary';
 import { Quiz } from './components/Quiz';
 import './App.css';
 
-type AppTab = 'home' | 'simulator' | 'manufacturers' | 'glossary' | 'quiz';
+type AppTab = 'home' | 'simulator' | 'manufacturers' | 'sensor_reflector' | 'glossary' | 'quiz';
 
 function App() {
   const [activeTab, setActiveTab] = useState<AppTab>('home');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -39,13 +41,13 @@ function App() {
                 <svg viewBox="0 0 200 200" className="hero-svg">
                   <defs>
                     <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stopColor="rgba(234, 179, 8, 0.4)" />
-                      <stop offset="100%" stopColor="rgba(234, 179, 8, 0)" />
+                      <stop offset="0%" stopColor="rgba(14, 165, 233, 0.4)" />
+                      <stop offset="100%" stopColor="rgba(14, 165, 233, 0)" />
                     </radialGradient>
                   </defs>
                   {/* 背景のグリッド */}
-                  <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" />
-                  <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" />
+                  <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(0, 0, 0, 0.05)" strokeWidth="1" />
+                  <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(0, 0, 0, 0.05)" strokeWidth="1" />
                   {/* 反射材（プリズム面） */}
                   <polygon points="90,120 110,120 100,105" fill="#38bdf8" stroke="#0ea5e9" strokeWidth="1.5" />
                   <polygon points="70,120 90,120 80,105" fill="#38bdf8" stroke="#0ea5e9" strokeWidth="1.5" />
@@ -53,18 +55,18 @@ function App() {
                   {/* 発光グロー */}
                   <circle cx="100" cy="112" r="35" fill="url(#glow)" />
                   {/* 光源（ヘッドライト） */}
-                  <circle cx="40" cy="50" r="8" fill="#fef08a" />
-                  <circle cx="40" cy="50" r="16" fill="none" stroke="rgba(254, 240, 138, 0.2)" strokeWidth="1" />
+                  <circle cx="40" cy="50" r="8" fill="#fef08a" stroke="#eab308" strokeWidth="1" />
+                  <circle cx="40" cy="50" r="16" fill="none" stroke="rgba(254, 240, 138, 0.4)" strokeWidth="1" />
                   {/* ドライバーの目 */}
-                  <circle cx="45" cy="30" r="6" fill="#60a5fa" />
+                  <circle cx="45" cy="30" r="6" fill="#6366f1" />
                   {/* 光線（照射） */}
-                  <line x1="40" y1="50" x2="100" y2="112" stroke="#eab308" strokeWidth="2" strokeDasharray="100" strokeDashoffset="0" />
+                  <line x1="40" y1="50" x2="100" y2="112" stroke="#eab308" strokeWidth="2.5" />
                   {/* 光線（反射） */}
-                  <line x1="100" y1="112" x2="45" y2="30" stroke="#60a5fa" strokeWidth="2.5" />
+                  <line x1="100" y1="112" x2="45" y2="30" stroke="#6366f1" strokeWidth="2.5" />
                   {/* ラベル */}
-                  <text x="30" y="75" fill="#eab308" fontSize="8" fontFamily="Outfit">照射軸 (Light)</text>
-                  <text x="55" y="25" fill="#60a5fa" fontSize="8" fontFamily="Outfit">観測軸 (Eye)</text>
-                  <text x="135" y="130" fill="#38bdf8" fontSize="8" fontFamily="Outfit">反射素子</text>
+                  <text x="30" y="75" fill="#d97706" fontSize="8" fontWeight="bold" fontFamily="Outfit">照射軸 (Light)</text>
+                  <text x="55" y="25" fill="#4f46e5" fontSize="8" fontWeight="bold" fontFamily="Outfit">観測軸 (Eye)</text>
+                  <text x="135" y="130" fill="#0284c7" fontSize="8" fontWeight="bold" fontFamily="Outfit">反射素子</text>
                 </svg>
               </div>
             </div>
@@ -115,8 +117,15 @@ function App() {
               <div className="nav-card" onClick={() => setActiveTab('manufacturers')}>
                 <div className="nav-card-icon">🔬</div>
                 <h3>メーカー分析 ＆ アカデミー</h3>
-                <p>3M・Orafol・NCIの技術仕様、コア特許、製品比較、およびスネルの法則や直交ベクトル計算の数理を学びます。</p>
+                <p>3M・Orafol・NCI の全製品ラインナップ、コア特許、およびスネルの法則や直交ベクトル計算の数理を学びます。</p>
                 <span className="nav-link-text">メーカー分析を開く →</span>
+              </div>
+
+              <div className="nav-card" onClick={() => setActiveTab('sensor_reflector')}>
+                <div className="nav-card-icon">📡</div>
+                <h3>光電センサー用反射板</h3>
+                <p>FAラインで使用されるオムロンやキーエンスなどの光電センサー用リフレクタ技術、および偏光M.S.R.特性を学びます。</p>
+                <span className="nav-link-text">センサー用技術を開く →</span>
               </div>
               
               <div className="nav-card" onClick={() => setActiveTab('glossary')}>
@@ -139,6 +148,8 @@ function App() {
         return <Simulator />;
       case 'manufacturers':
         return <Manufacturers />;
+      case 'sensor_reflector':
+        return <SensorReflector />;
       case 'glossary':
         return <Glossary />;
       case 'quiz':
@@ -147,63 +158,90 @@ function App() {
   };
 
   return (
-    <div className="app-wrapper">
-      {/* ナビゲーションバー */}
-      <header className="global-header">
-        <div className="header-container">
-          <div className="logo-area" onClick={() => setActiveTab('home')}>
+    <div className="app-wrapper sidebar-layout">
+      {/* モバイルヘッダー（レスポンシブ用） */}
+      <header className="mobile-header">
+        <div className="logo-area" onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}>
+          <span className="logo-icon">💫</span>
+          <span className="logo-text">Retro-reflective</span>
+        </div>
+        <button className="menu-toggle-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          {mobileMenuOpen ? '✕' : '☰'}
+        </button>
+      </header>
+
+      {/* 左サイドバー */}
+      <aside className={`global-sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-sticky">
+          <div className="logo-area" onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}>
             <span className="logo-icon">💫</span>
-            <span className="logo-text">Retro-reflective Academy</span>
+            <span className="logo-text">Retro-reflective<br /><span className="logo-sub">Academy</span></span>
           </div>
+
           <nav className="nav-menu">
             <button
               className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
-              onClick={() => setActiveTab('home')}
+              onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}
             >
-              ホーム
+              🏠 ホーム
             </button>
             <button
               className={`nav-item ${activeTab === 'simulator' ? 'active' : ''}`}
-              onClick={() => setActiveTab('simulator')}
+              onClick={() => { setActiveTab('simulator'); setMobileMenuOpen(false); }}
             >
-              シミュレーター
+              🎛️ シミュレーター
             </button>
             <button
               className={`nav-item ${activeTab === 'manufacturers' ? 'active' : ''}`}
-              onClick={() => setActiveTab('manufacturers')}
+              onClick={() => { setActiveTab('manufacturers'); setMobileMenuOpen(false); }}
             >
-              主要メーカー ＆ アカデミー
+              🔬 メーカー ＆ アカデミー
+            </button>
+            <button
+              className={`nav-item ${activeTab === 'sensor_reflector' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('sensor_reflector'); setMobileMenuOpen(false); }}
+            >
+              📡 センサー用反射板
             </button>
             <button
               className={`nav-item ${activeTab === 'glossary' ? 'active' : ''}`}
-              onClick={() => setActiveTab('glossary')}
+              onClick={() => { setActiveTab('glossary'); setMobileMenuOpen(false); }}
             >
-              専門用語集
+              📖 専門用語集
             </button>
             <button
               className={`nav-item ${activeTab === 'quiz' ? 'active' : ''}`}
-              onClick={() => setActiveTab('quiz')}
+              onClick={() => { setActiveTab('quiz'); setMobileMenuOpen(false); }}
             >
-              理解度テスト
+              📝 理解度テスト
             </button>
           </nav>
+
+          <div className="sidebar-info-box">
+            <span className="info-title">💡 学びのヒント</span>
+            <p className="info-body">
+              シミュレーターで「観測角」を変更してみましょう。トラックや近距離での見え方の違いが視覚的に理解できます！
+            </p>
+          </div>
         </div>
-      </header>
+      </aside>
 
       {/* メインコンテンツエリア */}
-      <main className="main-content-area">
-        <div className="content-container">
-          {renderTabContent()}
-        </div>
-      </main>
+      <div className="main-layout-wrapper">
+        <main className="main-content-area">
+          <div className="content-container">
+            {renderTabContent()}
+          </div>
+        </main>
 
-      {/* フッター */}
-      <footer className="global-footer">
-        <div className="footer-container">
-          <p>© 2026 再帰反射シート学習アカデミー - retroreflective-study</p>
-          <p className="footer-sub">3M / ORAFOL / 日本カーバイド工業（NCI）の技術リサーチデータに基づく学習ツール</p>
-        </div>
-      </footer>
+        {/* フッター */}
+        <footer className="global-footer">
+          <div className="footer-container">
+            <p>© 2026 再帰反射シート学習アカデミー - retroreflective-study</p>
+            <p className="footer-sub">3M / ORAFOL / 日本カーバイド工業（NCI）/ 各社センサーリフレクタの技術リサーチデータに基づく学習ツール</p>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }
