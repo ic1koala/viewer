@@ -53,7 +53,6 @@ export const SensorReflector: React.FC = () => {
                   <strong>受光部偏光フィルターによる選別:</strong>
                   受光素子の前面には「縦方向」の偏光波しか通さないフィルターを配置します。
                   これにより、<strong>ワークからの鏡面反射（横偏光）はフィルターに遮断されて受光できず、リフレクタからの戻り光（縦偏光）だけが通過</strong>して受光されます。
-                  結果として、光沢のある缶やペットボトルが光路を塞いだときも、誤検出なく「遮光（物体あり）」と判定できます。
                 </li>
               </ol>
             </div>
@@ -70,52 +69,104 @@ export const SensorReflector: React.FC = () => {
         </div>
       </div>
 
+      {/* 新設：アカデミック解説（位相差と偏光回転の数理物理） */}
+      <div className="section-divider"></div>
+      
+      <div className="academic-polarization-section">
+        <h3>🎓 【学術解析】全反射における位相差と偏光回転の物理学</h3>
+        <p>
+          直交三面鏡（コーナーキューブ）が直線偏光の振動方向を幾何学的に90度回転させて戻すプロセスの背後には、電磁気学における**「全反射時のフレネル位相差（Fresnel Phase Shift）」**と**「3次元座標系における偏光ベクトルの幾何学的変換」**の2つの物理現象が作用しています。
+        </p>
+
+        <div className="academic-theory-grid">
+          <div className="theory-box">
+            <h4>1. 全反射におけるフレネル位相シフトの発生</h4>
+            <p>
+              光が屈折率 {"$n_1$"} （アクリル等の透明媒体）の内部から屈折率 {"$n_2 = 1.0$"} （空気層）の境界へ、臨界角 {"$\theta_c = \arcsin(1/n_1)$"} より大きな入射角 {"$\theta_i$"} で全反射するとき、マクスウェル方程式の境界条件を満たすために、反射波の電気ベクトルの位相がずれます。
+            </p>
+            <p>
+              このとき、入射面に平行な電場成分（P波）の位相変化 {"$\delta_p$"} と、垂直な電場成分（S波）の位相変化 {"$\delta_s$"} は等しくなく、フレネルの式より以下の位相差方程式が成り立ちます。
+            </p>
+            <div className="math-formula-box">
+              {"\\[ \\tan\\left(\\frac{\\delta_p}{2}\\right) = -\\frac{\\sqrt{\\sin^2\\theta_i - (1/n_1)^2}}{(1/n_1)^2\\cos\\theta_i} \\]"}
+              {"\\[ \\tan\\left(\\frac{\\delta_s}{2}\\right) = -\\frac{\\sqrt{\\sin^2\\theta_i - (1/n_1)^2}}{\\cos\\theta_i} \\]"}
+            </div>
+            <p>
+              この2成分のずれにより、1回の全反射ごとに生じる位相差 {"$\Delta = \delta_p - \delta_s$"} は以下のように計算されます。
+            </p>
+            <div className="math-formula-box">
+              {"\\[ \\tan\\left(\\frac{\\Delta}{2}\\right) = \\frac{\\cos\\theta_i \\sqrt{\\sin^2\\theta_i - (1/n_1)^2}}{\\sin^2\\theta_i} \\]"}
+            </div>
+            <p>
+              アクリル（{"$n_1 \\approx 1.49$"}）で成形されたコーナーキューブにおいて、内部全反射時の入射角は幾何学的に {"$\\theta_i \\approx 54.7^\\circ$"} となり、このときの1回あたりの位相差 {"$\\Delta$"} は約 {"$45^\\circ \\sim 50^\\circ$"} に達します。この位相変化により、入射した直線偏光は、1回反射するごとに楕円偏光へと変化します。
+            </p>
+          </div>
+
+          <div className="theory-box">
+            <h4>2. 三次元直交反射による幾何学的偏光の回転</h4>
+            <p>
+              コーナーキューブ内では、光線が直交する3つの鏡面（{"$x=0, y=0, z=0$"}）で3回連続して全反射します。
+              各面における局所的な入射面（P波・S波の基準軸）は、プリズムの進行方向に沿って互いに直交しているため、反射するたびに電気ベクトルの成分が反転します。
+            </p>
+            <p>
+              この3次元座標回転の幾何学的効果と、3回の全反射によって累積される総位相差 {"$\\Delta_{\\text{total}} = 3 \\times \\Delta \\approx 140^\\circ \\sim 150^\\circ$"} が足し合わされることで、最終的な戻り光は、入射した直線偏光の振動方向（S偏光：横偏光）に対して**ちょうど垂直な振動方向の成分（P偏光：縦偏光）**へと幾何学的に変換されて戻ります。
+            </p>
+            <p>
+              一方、金属缶やガラス板などのワーク表面での正反射では、位相シフトの差が小さく偏光回転が起きないため、戻り光は横偏光のままです。
+              受光部の偏光フィルターがこの「90度回転した偏光成分（縦偏光）」のみを通過させることで、ワークの正反射光を完璧に遮断し、リフレクタからの光だけを検知することができます。
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="section-divider"></div>
 
-      {/* 各社製品ラインナップ */}
-      <h3 className="home-section-title">主要メーカーのセンサー用リフレクタ製品カタログ</h3>
+      {/* センサー用リフレクタ製品仕様比較一覧表（中途半端な文章の表化整理） */}
+      <h3 className="home-section-title">主要メーカーのセンサー用リフレクタ製品仕様一覧</h3>
       <p className="section-intro-text">
-        FAで多用される主要な成形リフレクタおよびマイクロプリズムシート製品です。センサーのレーザー・LED径、取付スペースに合わせて選定されます。詳細仕様は各公式リンクから確認できます。
+        以下は、FAラインの設計で広く使用される主要なセンサー用リフレクタの製品スペック比較表です。外形寸法、微細プリズムサイズ、および公式の製品仕様への直リンクを整理してまとめています。
       </p>
-      
-      <div className="reflector-products-grid">
-        {sensorReflectorData.map((prod) => (
-          <div key={prod.id} className="reflector-product-card">
-            <div className="reflector-card-header">
-              <span className="mfr-badge">{prod.manufacturer}</span>
-              <h4 className="model-number">{prod.modelNumber}</h4>
-            </div>
-            <div className="reflector-specs">
-              <div className="spec-row">
-                <span className="spec-label">外形寸法:</span>
-                <span className="spec-val">{prod.size}</span>
-              </div>
-              <div className="spec-row">
-                <span className="spec-label">プリズムサイズ:</span>
-                <span className="spec-val highlight-val">{prod.prismSize}</span>
-              </div>
-            </div>
-            <p className="prod-description">{prod.description}</p>
-            <div className="features-list-wrapper">
-              <h5>主な特徴・光学性能:</h5>
-              <ul className="bullet-list-small">
-                {prod.features.map((feat, i) => (
-                  <li key={i}>{feat}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="reflector-card-action">
-              <a
-                href={prod.officialUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="reflector-link-btn"
-              >
-                🔗 公式製品サイトで確認する →
-              </a>
-            </div>
-          </div>
-        ))}
+
+      <div className="academy-comparison-table-box">
+        <table className="comparison-table sensor-spec-comparison-table">
+          <thead>
+            <tr>
+              <th style={{ width: '15%' }}>メーカー</th>
+              <th style={{ width: '15%' }}>型番・シリーズ</th>
+              <th style={{ width: '20%' }}>外形寸法 (厚み)</th>
+              <th style={{ width: '20%' }}>プリズム形状 (ピッチ)</th>
+              <th style={{ width: '20%' }}>主な特徴・光学性能</th>
+              <th style={{ width: '10%' }}>詳細リンク</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sensorReflectorData.map((prod) => (
+              <tr key={prod.id}>
+                <td><strong>{prod.manufacturer}</strong></td>
+                <td><code className="table-code">{prod.modelNumber}</code></td>
+                <td>{prod.size}</td>
+                <td className="highlight-val-cell">{prod.prismSize}</td>
+                <td>
+                  <ul className="table-bullet-list">
+                    {prod.features.map((feat, i) => (
+                      <li key={i}>{feat}</li>
+                    ))}
+                  </ul>
+                </td>
+                <td style={{ textAlign: 'center' }}>
+                  <a
+                    href={prod.officialUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="table-link-btn"
+                  >
+                    🔗 公式
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="section-divider"></div>
@@ -126,9 +177,9 @@ export const SensorReflector: React.FC = () => {
         <table className="comparison-table">
           <thead>
             <tr>
-              <th>比較項目</th>
-              <th>道路標識用反射シート (3M, NCIなど)</th>
-              <th>光電センサー用リフレクタ (オムロン, キーエンスなど)</th>
+              <th style={{ width: '20%' }}>比較項目</th>
+              <th style={{ width: '40%' }}>道路標識用反射シート (3M, NCIなど)</th>
+              <th style={{ width: '40%' }}>光電センサー用リフレクタ (オムロン, キーエンスなど)</th>
             </tr>
           </thead>
           <tbody>

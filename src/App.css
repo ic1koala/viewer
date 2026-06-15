@@ -2409,3 +2409,200 @@
   color: #0369a1;
   transform: translateX(3px);
 }
+
+/* ==========================================================================
+   ACADEMIC POLARIZATION & COMPARISON TABLES STYLES
+   ========================================================================== */
+
+/* 偏光アカデミック解説エリア */
+.academic-polarization-section {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 16px;
+  padding: 2.2rem;
+  margin-top: 2.5rem;
+  color: #f8fafc;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.academic-polarization-section h3 {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #38bdf8;
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.6rem;
+}
+
+.academic-polarization-section > p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #cbd5e1;
+  margin-bottom: 2rem;
+}
+
+.academic-theory-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 900px) {
+  .academic-theory-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.theory-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.theory-box h4 {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #bae6fd;
+  margin-bottom: 1rem;
+}
+
+.theory-box p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  margin-bottom: 1.2rem;
+}
+
+.math-formula-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin: 1rem 0;
+  text-align: center;
+  font-family: "Courier New", Courier, monospace;
+  color: #38bdf8;
+  overflow-x: auto;
+}
+
+/* 比較表 (comparison-table) の共通スタイル定義 */
+.academy-comparison-table-box {
+  background: #ffffff;
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.8rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.01);
+  overflow-x: auto;
+}
+
+.table-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: 1.2rem;
+  border-left: 4px solid #0ea5e9;
+  padding-left: 0.6rem;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+  text-align: left;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  line-height: 1.6;
+}
+
+.comparison-table th:last-child,
+.comparison-table td:last-child {
+  border-right: none;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-table th {
+  background: #f8fafc;
+  color: var(--text-primary);
+  font-weight: 800;
+  font-family: var(--font-heading);
+}
+
+.comparison-table td {
+  color: var(--text-secondary);
+}
+
+/* センサー製品スペック表専用 */
+.sensor-spec-comparison-table {
+  font-size: 0.85rem;
+}
+
+.sensor-spec-comparison-table th {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  color: #0f172a;
+}
+
+.table-code {
+  font-family: monospace;
+  background: #f1f5f9;
+  color: #0369a1;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.highlight-val-cell {
+  color: #0284c7 !important;
+  font-weight: 700;
+}
+
+.table-bullet-list {
+  list-style-type: disc;
+  margin-left: 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.table-bullet-list li {
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.table-link-btn {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #0284c7;
+  border: 1px solid #e2e8f0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.8rem;
+  transition: var(--transition-smooth);
+}
+
+.table-link-btn:hover {
+  background: #0ea5e9;
+  color: white;
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
+}
