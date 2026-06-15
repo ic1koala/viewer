@@ -724,74 +724,75 @@ export const Simulator: React.FC = () => {
             </div>
           </div>
 
-          {/* リアルタイム視認境界チェックシート */}
-          <div className="realtime-check-sheet">
-            <h4>📊 リアルタイム視認基準チェック</h4>
-            <div className="check-grid">
-              <div className={`check-item ${obsAngleDeg > 1.2 ? 'check-failed' : obsAngleDeg > 0.5 ? 'check-warning' : 'check-success'}`}>
-                <span className="check-icon">
-                  {obsAngleDeg > 1.2 ? '❌' : obsAngleDeg > 0.5 ? '⚠️' : '✅'}
-                </span>
-                <div className="check-details">
-                  <h5>観測角制限 (α ≦ 1.20°)</h5>
-                  <p>現在: <strong>{obsAngleDeg.toFixed(2)}°</strong> (限界 1.20° / 警告 0.50°)</p>
-                </div>
-              </div>
-              <div className={`check-item ${Math.abs(entranceAngle) >= 40 ? 'check-failed' : Math.abs(entranceAngle) >= 20 ? 'check-warning' : 'check-success'}`}>
-                <span className="check-icon">
-                  {Math.abs(entranceAngle) >= 40 ? '❌' : Math.abs(entranceAngle) >= 20 ? '⚠️' : '✅'}
-                </span>
-                <div className="check-details">
-                  <h5>入射角制限 (β ≦ 40.0°)</h5>
-                  <p>現在: <strong>{Math.abs(entranceAngle)}.0°</strong> (限界 40.0° / 警告 20.0°)</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="danger-zones-box">
-              <h5>🚨 危険（視認NG）になる条件範囲</h5>
-              <div className="danger-limits-table-wrapper">
-                <table className="danger-limits-table">
-                  <thead>
-                    <tr>
-                      <th>車両タイプ</th>
-                      <th>アイポイント差 (h)</th>
-                      <th>危険（視認NG）になる範囲</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className={carType === 'sedan' ? 'highlight-danger-row' : ''}>
-                      <td>乗用車/セダン</td>
-                      <td>0.6 m</td>
-                      <td>測定距離 <strong>{getDangerZoneLimit('sedan')}m 以下</strong> (α ＞ 1.2°)</td>
-                    </tr>
-                    <tr className={carType === 'suv' ? 'highlight-danger-row' : ''}>
-                      <td>SUV</td>
-                      <td>0.9 m</td>
-                      <td>測定距離 <strong>{getDangerZoneLimit('suv')}m 以下</strong> (α ＞ 1.2°)</td>
-                    </tr>
-                    <tr className={carType === 'truck' ? 'highlight-danger-row' : ''}>
-                      <td>大型トラック</td>
-                      <td>1.5 m</td>
-                      <td>測定距離 <strong>{getDangerZoneLimit('truck')}m 以下</strong> (α ＞ 1.2°)</td>
-                    </tr>
-                    <tr className={Math.abs(entranceAngle) >= 40 ? 'highlight-danger-row' : ''}>
-                      <td>すべての車種</td>
-                      <td>-</td>
-                      <td>入射角(β - シートの傾き) <strong>40° 以上</strong> (左右)</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p className="danger-note">
-                ※ 距離が近づくほど、ライトと運転手の目の高低差による角度（観測角α）は<strong>広がります</strong>。
-                そのため、<strong>「近距離＝明るくて見えやすい」は間違い</strong>で、近すぎると再帰反射の有効光から目が外れて標識が消灯したように暗く見えなくなります（これがNGのメカニズムです）。
-              </p>
-            </div>
-          </div>
-
         </div>
       </div>
+
+      {/* リアルタイム視認境界チェックシート */}
+      <div className="realtime-check-sheet">
+        <h4>📊 リアルタイム視認基準チェック</h4>
+        <div className="check-grid">
+          <div className={`check-item ${obsAngleDeg > 1.2 ? 'check-failed' : obsAngleDeg > 0.5 ? 'check-warning' : 'check-success'}`}>
+            <span className="check-icon">
+              {obsAngleDeg > 1.2 ? '❌' : obsAngleDeg > 0.5 ? '⚠️' : '✅'}
+            </span>
+            <div className="check-details">
+              <h5>観測角制限 (α ≦ 1.20°)</h5>
+              <p>現在: <strong>{obsAngleDeg.toFixed(2)}°</strong> (限界 1.20° / 警告 0.50°)</p>
+            </div>
+          </div>
+          <div className={`check-item ${Math.abs(entranceAngle) >= 40 ? 'check-failed' : Math.abs(entranceAngle) >= 20 ? 'check-warning' : 'check-success'}`}>
+            <span className="check-icon">
+              {Math.abs(entranceAngle) >= 40 ? '❌' : Math.abs(entranceAngle) >= 20 ? '⚠️' : '✅'}
+            </span>
+            <div className="check-details">
+              <h5>入射角制限 (β ≦ 40.0°)</h5>
+              <p>現在: <strong>{Math.abs(entranceAngle)}.0°</strong> (限界 40.0° / 警告 20.0°)</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="danger-zones-box">
+          <h5>🚨 危険（視認NG）になる条件範囲</h5>
+          <div className="danger-limits-table-wrapper">
+            <table className="danger-limits-table">
+              <thead>
+                <tr>
+                  <th>車両タイプ</th>
+                  <th>アイポイント差 (h)</th>
+                  <th>危険（視認NG）になる範囲</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className={carType === 'sedan' ? 'highlight-danger-row' : ''}>
+                  <td>乗用車/セダン</td>
+                  <td>0.6 m</td>
+                  <td>測定距離 <strong>{getDangerZoneLimit('sedan')}m 以下</strong> (α ＞ 1.2°)</td>
+                </tr>
+                <tr className={carType === 'suv' ? 'highlight-danger-row' : ''}>
+                  <td>SUV</td>
+                  <td>0.9 m</td>
+                  <td>測定距離 <strong>{getDangerZoneLimit('suv')}m 以下</strong> (α ＞ 1.2°)</td>
+                </tr>
+                <tr className={carType === 'truck' ? 'highlight-danger-row' : ''}>
+                  <td>大型トラック</td>
+                  <td>1.5 m</td>
+                  <td>測定距離 <strong>{getDangerZoneLimit('truck')}m 以下</strong> (α ＞ 1.2°)</td>
+                </tr>
+                <tr className={Math.abs(entranceAngle) >= 40 ? 'highlight-danger-row' : ''}>
+                  <td>すべての車種</td>
+                  <td>-</td>
+                  <td>入射角(β - シートの傾き) <strong>40° 以上</strong> (左右)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="danger-note">
+            ※ 距離が近づくほど、ライトと運転手の目の高低差による角度（観測角α）は<strong>広がります</strong>。
+            そのため、<strong>「近距離＝明るくて見えやすい」は間違い</strong>で、近すぎると再帰反射の有効光から目が外れて標識が消灯したように暗く見えなくなります（これがNGのメカニズムです）。
+          </p>
+        </div>
+      </div>
+
     </div>
   );
 };
