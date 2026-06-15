@@ -130,6 +130,61 @@ export const Manufacturers: React.FC = () => {
               </div>
             </div>
 
+            {/* 保管・温度仕様 */}
+            <div className="detail-section specs-environmental-box">
+              <h4 className="section-heading-small">物理・環境適合仕様（保管条件・施工/使用温度）</h4>
+              <div className="env-specs-grid">
+                <div className="env-spec-card">
+                  <div className="env-spec-icon">🌡️</div>
+                  <div className="env-spec-details">
+                    <h5>推奨保管環境</h5>
+                    <p>{selectedMfr.id === '3m' 
+                      ? '温度 18°C〜24°C / 相対湿度 30%〜50% (直射日光厳禁)' 
+                      : selectedMfr.id === 'orafol' 
+                      ? '温度 18°C〜24°C / 相対湿度 40%〜60% (直射日光厳禁)' 
+                      : '温度 15°C〜27°C / 相対湿度 30%〜60% (直射日光避ける)'
+                    }</p>
+                  </div>
+                </div>
+                <div className="env-spec-card">
+                  <div className="env-spec-icon">📦</div>
+                  <div className="env-spec-details">
+                    <h5>保管方法 ＆ 有効期限</h5>
+                    <p>{selectedMfr.id === '3m'
+                      ? '水平懸架または箱入り水平保管 / 製造後 2〜3年以内の施工推奨'
+                      : selectedMfr.id === 'orafol'
+                      ? '両端スペーサーを用いた水平懸架 / 製造後 2年以内の施工推奨'
+                      : '専用保持具または宙吊り水平保管 / 購入後 1年以内の使用推奨(床への直置き・立てかけ厳禁)'
+                    }</p>
+                  </div>
+                </div>
+                <div className="env-spec-card">
+                  <div className="env-spec-icon">🛠️</div>
+                  <div className="env-spec-details">
+                    <h5>推奨施工温度 (貼り付け/カット)</h5>
+                    <p>{selectedMfr.id === '3m'
+                      ? '貼り付け: 18°C以上推奨 (低温時は基材とシートのヒーター加温が必須)'
+                      : selectedMfr.id === 'orafol'
+                      ? '貼り付け: 15°C〜38°C推奨 (施工時の最低限界周囲温度: 7°C〜8°C以上)'
+                      : '貼り付け: 20°C〜26°C推奨 (端面クラック防止のため18°C以下でのカット切断は厳禁)'
+                    }</p>
+                  </div>
+                </div>
+                <div className="env-spec-card">
+                  <div className="env-spec-icon">❄️</div>
+                  <div className="env-spec-details">
+                    <h5>実用動作温度耐性 (施工後)</h5>
+                    <p>{selectedMfr.id === '3m'
+                      ? '-40°C 〜 +82°C (極寒の降雪地域からアスファルト反射の酷暑まで耐性を実証)'
+                      : selectedMfr.id === 'orafol'
+                      ? '-40°C 〜 +82°C (単層構造により海水浸漬や過酷な高湿度下の白濁化・腐食も防止)'
+                      : '-40°C 〜 +82°C (アクリル樹脂の国内調合技術により寒暖差での破断・ひび割れを抑制)'
+                    }</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* 歴史・概要 */}
             <div className="detail-section">
               <h4 className="section-heading-small">沿革と開発の歴史</h4>
