@@ -30,21 +30,17 @@ export const Simulator: React.FC = () => {
   // 入射角 β
   const entAngleRad = (entranceAngle * Math.PI) / 180;
 
-  // 簡易的な比反射輝度 RA の計算モデル
-  // RA = RA_max * exp(-a * alpha^2) * cos(beta) * 補正
+  // 比反射輝度 RA の計算モデル
   const getRetroreflectivity = (type: SheetType, alpha: number, beta: number): number => {
     const alphaDeg = (alpha * 180) / Math.PI;
     const betaDeg = (beta * 180) / Math.PI;
     
     switch (type) {
       case 'bead': // ガラスビーズ型 (低輝度、広角)
-        // ピーク輝度は低いが、観測角・入射角が大きくなっても緩やかにしか低下しない
         return Math.round(90 * Math.exp(-0.35 * Math.pow(alphaDeg, 1.8)) * Math.cos(beta) * (1 - Math.abs(betaDeg) / 90));
       case 'prism': // プリズム型 (高輝度、やや狭角)
-        // ピーク輝度は高いが、観測角・入射角による減衰がやや大きい
         return Math.round(500 * Math.exp(-1.4 * Math.pow(alphaDeg, 1.5)) * Math.cos(beta * 1.2) * (1 - Math.abs(betaDeg) / 60));
       case 'fullcube': // フルキューブプリズム型 (超高輝度、超広角)
-        // 非常に高いピーク輝度を持ち、広角性も改善されている (3M DG3などのモデル)
         return Math.round(900 * Math.exp(-0.8 * Math.pow(alphaDeg, 1.3)) * Math.cos(beta * 0.9) * (1 - Math.abs(betaDeg) / 80));
     }
   };
@@ -53,43 +49,54 @@ export const Simulator: React.FC = () => {
 
   // 視認性能判定と動的解説の定義
   const getInspectionResult = () => {
-    if (obsAngleDeg > 1.2 || Math.abs(entranceAngle) >= 40) {
+    const isObsNg = obsAngleDeg > 1.2;
+    const isEntNg = Math.abs(entranceAngle) >= 40;
+    const isObsWarn = obsAngleDeg > 0.5 && obsAngleDeg <= 1.2;
+    const isEntWarn = Math.abs(entranceAngle) >= 20 && Math.abs(entranceAngle) < 40;
+
+    if (isObsNg || isEntNg) {
       return {
         status: 'ng' as const,
-        advice: '❌ 視認NG：反射光が極端に減衰し、ドライバーから標識は見えません。',
-        reason: obsAngleDeg > 1.2 
-          ? `【原因】観測角αが広すぎます（${obsAngleDeg.toFixed(2)}°）。車が標識に近づきすぎているか、大型車（トラック）のようにアイポイント（光源と目の垂直距離）が高いためです。反射光の「光錐（光のコーン）」の中心から目が完全に外れてしまっています。`
-          : `【原因】入射角βが大きすぎます（${Math.abs(entranceAngle)}°）。光の進入角度が急なため、プリズム内での全反射条件（臨界角）が崩れて光が背面に抜けているか、ガラスビーズの球面収差により裏面の反射膜へ焦点を結ばなくなっています。`
+        advice: '❌ 視認NG：反射光がドライバーに届かず、標識は完全に暗黒化します。',
+        reason: isObsNg 
+          ? `【観測角NG】観測角αが広すぎます（現在 ${obsAngleDeg.toFixed(2)}° ＞ 限界 1.20°）。車が標識に近づきすぎているか、アイポイント（ライトと目の垂直差）が高いためです。反射光の「光錐（光のコーン）」の中心からドライバーの目が完全に外れてしまっています。`
+          : `【入射角NG】入射角βが大きすぎます（現在 ${Math.abs(entranceAngle)}° ＞ 限界 40°）。光の進入角度が急すぎるため、プリズム背面での全反射条件（臨界角）が崩れて光が透過漏れしているか、ビーズの球面収差により裏面の反射膜へ焦点を結ばなくなっています。`
       };
-    } else if (obsAngleDeg > 0.5 || Math.abs(entranceAngle) >= 20) {
+    } else if (isObsWarn || isEntWarn) {
       return {
         status: 'warn' as const,
-        advice: '⚠️ 注意：視認性が低下しています。車載ライトからの反射が弱く見えます。',
-        reason: obsAngleDeg > 0.5
-          ? `【原因】観測角αがやや広がっています（${obsAngleDeg.toFixed(2)}°）。ビーズ型や通常のプリズム型シートでは輝度の減衰が目立ちます。より高輝度かつ広角性に優れたフルキューブ型（3M DG³等）への変更を検討してください。`
-          : `【原因】入射角βがやや大きいです（${Math.abs(entranceAngle)}°）。標識が斜めを向いているため、反射効率が低下しています。大入射角（広角性）に特化したシート設計が求められます。`
+        advice: '⚠️ 注意：視認性が大幅に低下しています。反射光が弱くボヤけて見えます。',
+        reason: isObsWarn
+          ? `【観測角警告】観測角αがやや広がっています（現在 ${obsAngleDeg.toFixed(2)}°）。ガラスビーズ型や通常プリズム型では輝度が大幅に低下します。広角性に優れるフルキューブ型（3M DG³等）を使用すれば視認性をある程度カバー可能です。`
+          : `【入射角警告】入射角βがやや大きいです（現在 ${Math.abs(entranceAngle)}°）。標識が傾いて設置されているか、急カーブ手前での受光のため、反射効率が低下しています。広角性に配慮したシート設計が必要です。`
       };
     } else {
       return {
         status: 'ok' as const,
         advice: '✨ 良好：夜間でも極めて鮮明に標識を認識できる、最適な幾何条件です。',
-        reason: '【解説】観測角α（0.5°以下）および入射角β（20°未満）が十分に小さく、再帰反射の幾何光学条件（スネルの法則・全反射）が理想的に維持されています。最もエネルギーの強い反射光の中心部にドライバーの目が位置しています。'
+        reason: '【解説】観測角α（0.50°以下）および入射角β（20°未満）が十分に小さく、再帰反射の幾何光学条件が理想的に維持されています。最もエネルギーの強い中心反射光の真ん中にドライバーの目が位置しています。'
       };
     }
   };
 
   const result = getInspectionResult();
 
+  // 各車種におけるNGとなる危険距離の算出（観測角 α > 1.2° になる距離）
+  const getDangerZoneLimit = (type: CarType): number => {
+    // tan(1.2 deg) = h / distance => distance = h / tan(1.2 deg)
+    const limitRad = (1.2 * Math.PI) / 180;
+    return Math.round(eyeHeights[type] / Math.tan(limitRad));
+  };
+
   // マクロシミュレーション描画
   useEffect(() => {
-    if (microMode) return; // ミクロモード時はマクロ描画をスキップ
+    if (microMode) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // キャンバスのリセット
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // 背景（夜の道路）
@@ -117,18 +124,19 @@ export const Simulator: React.FC = () => {
     ctx.stroke();
     ctx.setLineDash([]); // リセット
 
-    // スケール変換: 20m - 150m を キャンバスの 80px - 580px にマッピング
-    // 距離が短い(20m)ほど車は右側(標識に近い)、長い(150m)ほど左側(標識から遠い)になるようマッピング
+    // スケール変換: 20m - 150m を キャンバスの 220px - 640px にマッピング
+    // 距離が短い(20m)ほど車は左側(標識に近い)、長い(150m)ほど右側(標識から遠い)になるようマッピング
     const minD = 20, maxD = 150;
-    const minX = 80, maxX = 560;
-    const carX = maxX - ((distance - minD) / (maxD - minD)) * (maxX - minX);
-    const signX = 680; // 標識の位置 (固定)
-    const signY = 140; // 標識の高さ (固定)
+    const minX = 220, maxX = 640;
+    const carX = minX + ((distance - minD) / (maxD - minD)) * (maxX - minX);
+    
+    // 標識の位置 (左側に配置)
+    const signX = 80;
+    const signY = 140;
 
     // 1. 反射シート（標識）の描画
     ctx.save();
     ctx.translate(signX, signY);
-    // 入射角の傾きを適用
     ctx.rotate(entAngleRad);
 
     // 標識の柱と枠
@@ -144,7 +152,7 @@ export const Simulator: React.FC = () => {
     ctx.translate(signX, signY);
     ctx.rotate(entAngleRad);
     
-    // 標識のベース（アルミ板風）
+    // 標識のベース
     ctx.fillStyle = '#0f172a';
     ctx.strokeStyle = '#64748b';
     ctx.lineWidth = 3;
@@ -154,13 +162,13 @@ export const Simulator: React.FC = () => {
     ctx.stroke();
 
     // 反射輝度に応じた発光エフェクトの描画
-    const glowIntensity = Math.min(currentRA / 1000, 1.0);
+    const glowIntensity = result.status === 'ng' ? 0 : Math.min(currentRA / 1000, 1.0);
     if (glowIntensity > 0.05) {
       const glowGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, 25 + glowIntensity * 50);
       
       let glowColor = 'rgba(234, 179, 8, '; // デフォルト黄色
-      if (selectedSheet === 'bead') glowColor = 'rgba(244, 63, 94, '; // ビーズは赤/ピンク系で表現
-      if (selectedSheet === 'fullcube') glowColor = 'rgba(34, 197, 94, '; // フルキューブは緑系で表現
+      if (selectedSheet === 'bead') glowColor = 'rgba(244, 63, 94, '; // ビーズは赤/ピンク系
+      if (selectedSheet === 'fullcube') glowColor = 'rgba(34, 197, 94, '; // フルキューブは緑系
 
       glowGrad.addColorStop(0, glowColor + glowIntensity * 0.9 + ')');
       glowGrad.addColorStop(0.3, glowColor + glowIntensity * 0.4 + ')');
@@ -172,7 +180,7 @@ export const Simulator: React.FC = () => {
       ctx.fill();
     }
 
-    // 反射面
+    // 反射面の色決定
     let sheetColor = '#eab308'; // 黄
     if (selectedSheet === 'bead') sheetColor = '#f43f5e'; // 赤系
     if (selectedSheet === 'fullcube') sheetColor = '#22c55e'; // 緑系
@@ -181,56 +189,58 @@ export const Simulator: React.FC = () => {
     ctx.arc(0, 0, 22, 0, Math.PI * 2);
     ctx.fill();
 
-    // 標識マーク（矢印）
+    // 標識マーク（左折の矢印、車が走ってくる側に向ける）
     ctx.fillStyle = '#000000';
     ctx.beginPath();
-    ctx.moveTo(-8, -12);
-    ctx.lineTo(12, 0);
-    ctx.lineTo(-8, 12);
-    ctx.lineTo(-2, 0);
+    ctx.moveTo(8, -12);
+    ctx.lineTo(-12, 0);
+    ctx.lineTo(8, 12);
+    ctx.lineTo(2, 0);
     ctx.closePath();
     ctx.fill();
 
-    // 基準軸（法線）の描画
+    // 基準軸（法線）の描画（右の車両方向へ伸ばす）
     ctx.strokeStyle = '#ef4444';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.lineTo(-120, 0); // 前方へ伸ばす
+    ctx.lineTo(120, 0); 
     ctx.stroke();
     ctx.setLineDash([]);
     
     // 基準軸テキスト
     ctx.fillStyle = '#ef4444';
     ctx.font = '10px Outfit, sans-serif';
-    ctx.fillText('基準軸(法線)', -110, -8);
+    ctx.fillText('基準軸(法線)', 10, -8);
 
     ctx.restore();
 
-    // 2. 自動車と光源・受光器の描画
+    // 2. 自動車と光源・受光器の描画（左向き）
     const carY = 220;
     // 車体
     ctx.fillStyle = '#334155';
-    ctx.fillRect(carX - 50, carY, 60, 25);
+    ctx.fillRect(carX, carY, 60, 25); // carX が車の先頭（左端）
+    
+    // タイヤ
     ctx.beginPath();
-    ctx.arc(carX - 35, carY + 25, 8, 0, Math.PI * 2);
-    ctx.arc(carX - 5, carY + 25, 8, 0, Math.PI * 2);
+    ctx.arc(carX + 15, carY + 25, 8, 0, Math.PI * 2);
+    ctx.arc(carX + 45, carY + 25, 8, 0, Math.PI * 2);
     ctx.fillStyle = '#0f172a';
     ctx.fill();
     
-    // 車キャビン
+    // 車キャビン（左向き）
     ctx.fillStyle = '#475569';
     ctx.beginPath();
-    ctx.moveTo(carX - 40, carY);
-    ctx.lineTo(carX - 30, carY - 15);
-    ctx.lineTo(carX - 10, carY - 15);
-    ctx.lineTo(carX, carY);
+    ctx.moveTo(carX + 10, carY);
+    ctx.lineTo(carX + 20, carY - 15);
+    ctx.lineTo(carX + 45, carY - 15);
+    ctx.lineTo(carX + 55, carY);
     ctx.closePath();
     ctx.fill();
 
-    // 光源（ヘッドライト）
-    const lightX = carX + 10;
+    // 光源（ヘッドライト - 左端）
+    const lightX = carX;
     const lightY = carY + 12;
     ctx.fillStyle = '#fef08a';
     ctx.beginPath();
@@ -242,18 +252,15 @@ export const Simulator: React.FC = () => {
     ctx.arc(lightX, lightY, 10, 0, Math.PI * 2);
     ctx.fill();
 
-    // 受光器（ドライバーの目）
-    // carType に応じてヘッドライトからの高さを変える
-    // 画面上でのピクセル変換：高さ0.6m = 12px, 0.9m = 18px, 1.5m = 30px
+    // 受光器（ドライバーの目 - キャビンの左側寄りの席）
     const eyeScale = 20; // 1m = 20px
-    const eyeX = carX - 15;
+    const eyeX = carX + 22; // ヘッドライトより少し後方
     const eyeY = lightY - (h * eyeScale);
     
     ctx.fillStyle = '#60a5fa';
     ctx.beginPath();
     ctx.arc(eyeX, eyeY, 3, 0, Math.PI * 2);
     ctx.fill();
-    // 目標マーク風
     ctx.strokeStyle = '#60a5fa';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -269,7 +276,7 @@ export const Simulator: React.FC = () => {
     ctx.lineTo(signX, signY);
     ctx.stroke();
 
-    // 照射軸のライトコーン（光の広がりを表現）
+    // 照射軸のライトコーン
     ctx.fillStyle = 'rgba(250, 204, 21, 0.05)';
     ctx.beginPath();
     ctx.moveTo(lightX, lightY);
@@ -279,49 +286,58 @@ export const Simulator: React.FC = () => {
     ctx.fill();
 
     // 標識からドライバーの目への「観測軸」（水色の光線・戻り光）
-    // 反射輝度に応じて、戻り光線の不透明度（視認性）を変化させる
     const returnOpacity = Math.max(0.1, Math.min(currentRA / 600, 0.9));
-    ctx.strokeStyle = `rgba(96, 165, 250, ${returnOpacity})`;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(signX, signY);
-    ctx.lineTo(eyeX, eyeY);
-    ctx.stroke();
+    
+    if (result.status === 'ng') {
+      // NG時は戻り光線が届かない（極薄の赤点線）
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.2)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath();
+      ctx.moveTo(signX, signY);
+      ctx.lineTo(eyeX, eyeY);
+      ctx.stroke();
+      ctx.setLineDash([]); // リセット
+    } else {
+      ctx.strokeStyle = `rgba(96, 165, 250, ${returnOpacity})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(signX, signY);
+      ctx.lineTo(eyeX, eyeY);
+      ctx.stroke();
+    }
 
     // 4. 角度の可視化
-    // 照射軸と観測軸がなす「観測角 α」を強調表示
+    // 観測角 α
     ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 1.5;
-    // 標識近くで2軸が交わる角度を描画
     const angleToLight = Math.atan2(lightY - signY, lightX - signX);
     const angleToEye = Math.atan2(eyeY - signY, eyeX - signX);
     
     ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
     ctx.beginPath();
     ctx.moveTo(signX, signY);
-    // 標識から長さ80pxの扇形
     ctx.arc(signX, signY, 90, angleToLight, angleToEye, false);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // 観測角 α のテキストラベル
-    const labelX = signX - 120;
-    const labelY = signY + 20;
+    // 観測角 α のテキストラベル (車と重ならないよう右上に配置)
+    const labelX = signX + 110;
+    const labelY = signY + 25;
     ctx.fillStyle = '#60a5fa';
     ctx.font = 'bold 11px Outfit, sans-serif';
     ctx.fillText(`観測角 α: ${obsAngleDeg.toFixed(2)}° (${Math.round(obsAngleMinutes)}′)`, labelX, labelY);
     
     // 入射角 β の描画（基準軸と照射軸の間の角度）
-    // 標識から前方方向に向かう基準軸の角度は entAngleRad + Math.PI (180度反転)
-    const normAngle = entAngleRad + Math.PI;
+    // 基準軸は entAngleRad。照射軸は lightAngleFromSign
     const lightAngleFromSign = Math.atan2(lightY - signY, lightX - signX);
     
     ctx.strokeStyle = '#f87171';
     ctx.fillStyle = 'rgba(248, 113, 113, 0.15)';
     ctx.beginPath();
     ctx.moveTo(signX, signY);
-    ctx.arc(signX, signY, 60, Math.min(normAngle, lightAngleFromSign), Math.max(normAngle, lightAngleFromSign));
+    ctx.arc(signX, signY, 60, Math.min(entAngleRad, lightAngleFromSign), Math.max(entAngleRad, lightAngleFromSign));
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
@@ -329,7 +345,7 @@ export const Simulator: React.FC = () => {
     // 入射角 β のテキストラベル
     ctx.fillStyle = '#f87171';
     ctx.font = 'bold 11px Outfit, sans-serif';
-    ctx.fillText(`入射角 β: ${Math.abs(entranceAngle)}°`, signX - 80, signY - 45);
+    ctx.fillText(`入射角 β: ${Math.abs(entranceAngle)}°`, signX + 70, signY - 45);
 
     // 情報オーバーレイ
     ctx.fillStyle = '#ffffff';
@@ -337,9 +353,9 @@ export const Simulator: React.FC = () => {
     ctx.fillText(`測定距離: ${distance} m`, 20, 30);
     ctx.fillText(`アイポイント高さ(h): ${h} m (${carType.toUpperCase()})`, 20, 50);
 
-  }, [distance, carType, entranceAngle, selectedSheet, microMode, currentRA, obsAngleDeg, obsAngleMinutes, entAngleRad, h]);
+  }, [distance, carType, entranceAngle, selectedSheet, microMode, currentRA, obsAngleDeg, obsAngleMinutes, entAngleRad, h, result.status]);
 
-  // ミクロ反射原理（拡大アニメーション図）の描画
+  // ミクロ反射原理の描画
   useEffect(() => {
     if (!microMode) return;
 
@@ -355,27 +371,21 @@ export const Simulator: React.FC = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (selectedSheet === 'bead') {
-      // --- ガラスビーズ型のミクロ原理描画 ---
-      // タイトル
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 16px Outfit, sans-serif';
       ctx.fillText('ガラスビーズ型 再帰反射メカニズム (断面拡大)', 20, 40);
 
-      // ガラスビーズ球体
       const cx = canvas.width / 2;
       const cy = canvas.height / 2 + 10;
       const r = 100;
 
-      // 樹脂基材層と反射層（背面）
       ctx.strokeStyle = '#e2e8f0';
       ctx.fillStyle = '#334155';
       ctx.lineWidth = 4;
       ctx.beginPath();
-      // ビーズの背面にフィットする半球面反射膜
       ctx.arc(cx, cy, r + 4, -Math.PI/2, Math.PI/2, false);
       ctx.stroke();
 
-      // 反射層（アルミニウム蒸着）
       ctx.fillStyle = '#94a3b8';
       ctx.beginPath();
       ctx.arc(cx, cy, r + 6, -Math.PI/2, Math.PI/2, false);
@@ -383,7 +393,6 @@ export const Simulator: React.FC = () => {
       ctx.closePath();
       ctx.fill();
 
-      // ガラスビーズ本体（円）
       const glassGrad = ctx.createRadialGradient(cx - r/3, cy - r/3, 10, cx, cy, r);
       glassGrad.addColorStop(0, '#e0f2fe');
       glassGrad.addColorStop(0.8, '#bae6fd');
@@ -396,28 +405,21 @@ export const Simulator: React.FC = () => {
       ctx.fill();
       ctx.stroke();
 
-      // 光線のシミュレーション (Snellの法則による屈折)
-      // 入射光
       const incomingY = cy - 50;
       const startX = cx - 300;
       
-      // ガラスへの入射点
-      // 球面方程式 (x-cx)^2 + (y-cy)^2 = r^2 より、左側半球のx座標
-      // x = cx - sqrt(r^2 - (y-cy)^2)
       const dy = incomingY - cy;
       const intersectX = cx - Math.sqrt(r * r - dy * dy);
 
-      ctx.strokeStyle = '#eab308'; // 黄色光線
+      ctx.strokeStyle = '#eab308';
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(startX, incomingY);
       ctx.lineTo(intersectX, incomingY);
       ctx.stroke();
 
-      // 屈折光（ビーズ内）
-      // 理想屈折率 n=2.0 のとき、平行光線はちょうど裏面の極点 (cx + r, cy) で集光する
       const focusX = cx + r;
-      const focusY = cy; // 中心軸上（近軸）であれば
+      const focusY = cy;
 
       ctx.strokeStyle = 'rgba(234, 179, 8, 0.7)';
       ctx.beginPath();
@@ -425,11 +427,8 @@ export const Simulator: React.FC = () => {
       ctx.lineTo(focusX, focusY);
       ctx.stroke();
 
-      // 反射＆ビーズから出ていく光（再帰反射）
-      // 反射して再びビーズ表面の対称位置へ
-      // 出射点
       const exitX = intersectX;
-      const exitY = cy + (cy - incomingY); // 対称軸
+      const exitY = cy + (cy - incomingY);
 
       ctx.strokeStyle = 'rgba(234, 179, 8, 0.7)';
       ctx.beginPath();
@@ -437,15 +436,13 @@ export const Simulator: React.FC = () => {
       ctx.lineTo(exitX, exitY);
       ctx.stroke();
 
-      // 空気中への出射光 (元の平行光線と同じ角度で戻る)
-      ctx.strokeStyle = '#60a5fa'; // 戻り光は青で分かりやすく
+      ctx.strokeStyle = '#60a5fa';
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(exitX, exitY);
       ctx.lineTo(startX, exitY);
       ctx.stroke();
 
-      // ラベルと矢印
       ctx.fillStyle = '#ffffff';
       ctx.font = '13px Outfit, sans-serif';
       ctx.fillText('入射光 (ヘッドライト)', startX + 10, incomingY - 10);
@@ -458,18 +455,15 @@ export const Simulator: React.FC = () => {
       ctx.fillText('屈折率 n ≈ 1.9〜2.2', cx - 50, cy + 130);
 
     } else {
-      // --- プリズム型（コーナーキューブ）のミクロ原理描画 ---
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 16px Outfit, sans-serif';
       ctx.fillText('コーナーキューブ（プリズム）型 再帰反射メカニズム', 20, 40);
 
-      // 直交三面反射の2D簡易断面モデル（鋸歯状のプリズム素子）
       const startX = 100;
       const startY = 150;
-      const step = 100; // プリズムの幅
+      const step = 100;
       const count = 5;
 
-      // プリズム背面構造 (V字の配列)
       ctx.strokeStyle = '#38bdf8';
       ctx.lineWidth = 4;
       ctx.fillStyle = 'rgba(56, 189, 248, 0.1)';
@@ -477,8 +471,8 @@ export const Simulator: React.FC = () => {
       ctx.moveTo(startX, startY);
       for (let i = 0; i < count; i++) {
         const px = startX + i * step;
-        ctx.lineTo(px + step/2, startY + step * 0.8); // 頂点
-        ctx.lineTo(px + step, startY); // 底面
+        ctx.lineTo(px + step/2, startY + step * 0.8);
+        ctx.lineTo(px + step, startY);
       }
       ctx.stroke();
       ctx.lineTo(startX + count * step, startY - 50);
@@ -486,7 +480,6 @@ export const Simulator: React.FC = () => {
       ctx.closePath();
       ctx.fill();
 
-      // フロント表面フィルム面 (平滑な面)
       ctx.strokeStyle = '#64748b';
       ctx.lineWidth = 3;
       ctx.beginPath();
@@ -496,36 +489,23 @@ export const Simulator: React.FC = () => {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
       ctx.fillRect(startX, startY - 30, count * step, 30);
 
-      // 光線経路（コーナーキューブ内での反射）
-      // 中央の1つのV字谷に着目して光線を描く
-      const pIdx = 2; // 中央のプリズム
+      const pIdx = 2;
       const px = startX + pIdx * step;
       
       const rayInX = px + step * 0.2;
       const rayInY = startY - 100;
       const entryPointX = rayInX;
-      const entryPointY = startY - 30; // 表面での屈折
+      const entryPointY = startY - 30;
 
-      // 第1反射面 (左斜面) への到達
-      // 左斜面の式: y - startY = 1.6 * (x - px)
-      // 光線の式: x = entryPointX (垂直入射の場合)
-      // 交点
       const reflect1X = entryPointX;
       const reflect1Y = startY + 1.6 * (reflect1X - px);
 
-      // 第2反射面 (右斜面) への反射
-      // 90度直交反射のため、x軸方向に進む
-      // 右斜面の式: y - startY = -1.6 * (x - (px + step))
-      // 反射光: y = reflect1Y
-      // 交点 x: reflect1Y - startY = -1.6 * (x - px - step) => (reflect1Y - startY)/-1.6 + px + step
       const reflect2X = (reflect1Y - startY) / -1.6 + px + step;
       const reflect2Y = reflect1Y;
 
-      // 出射光 (入射方向と完全に並行に戻る)
       const exitPointX = reflect2X;
       const exitPointY = startY - 30;
 
-      // 1. 入射光
       ctx.strokeStyle = '#eab308';
       ctx.lineWidth = 4;
       ctx.beginPath();
@@ -533,7 +513,6 @@ export const Simulator: React.FC = () => {
       ctx.lineTo(entryPointX, entryPointY);
       ctx.stroke();
 
-      // 2. 内部光 (屈折含む)
       ctx.strokeStyle = 'rgba(234, 179, 8, 0.8)';
       ctx.lineWidth = 3;
       ctx.beginPath();
@@ -543,7 +522,6 @@ export const Simulator: React.FC = () => {
       ctx.lineTo(exitPointX, exitPointY);
       ctx.stroke();
 
-      // 3. 反射光
       ctx.strokeStyle = '#60a5fa';
       ctx.lineWidth = 4;
       ctx.beginPath();
@@ -551,21 +529,18 @@ export const Simulator: React.FC = () => {
       ctx.lineTo(exitPointX, rayInY);
       ctx.stroke();
 
-      // 空気（空気層）ラベル
       ctx.fillStyle = '#94a3b8';
       ctx.font = '12px Outfit, sans-serif';
       ctx.fillText('空気層 (全反射のために必須)', px + 10, startY + step + 15);
       ctx.fillText('プリズム素材 (アクリル等)', px - 80, startY - 10);
       ctx.fillText('表面フラットフィルム', px - 80, startY - 40);
 
-      // 光の方向矢印
       ctx.fillStyle = '#ffffff';
       ctx.font = '13px Outfit, sans-serif';
       ctx.fillText('入射光', rayInX - 25, rayInY - 10);
       ctx.fillStyle = '#60a5fa';
       ctx.fillText('再帰反射光', exitPointX - 35, rayInY - 10);
 
-      // 解説
       ctx.fillStyle = '#cbd5e1';
       ctx.font = '13px Outfit, sans-serif';
       ctx.fillText('直交する鏡面での全反射 (Total Internal Reflection) を利用するため、', 50, canvas.height - 50);
@@ -682,8 +657,8 @@ export const Simulator: React.FC = () => {
                   className="slider"
                 />
                 <div className="slider-range">
-                  <span>20m (近距離)</span>
-                  <span>150m (遠距離)</span>
+                  <span>20m (近距離・左側)</span>
+                  <span>150m (遠距離・右側)</span>
                 </div>
               </div>
 
@@ -727,7 +702,7 @@ export const Simulator: React.FC = () => {
             </div>
           )}
 
-          {/* 測定結果表示 */}
+          {/* 測定結果表示と動的アラート */}
           <div className="results-display">
             <div className="result-metric">
               <span className="metric-label">算出された観測角 (α)</span>
@@ -742,38 +717,79 @@ export const Simulator: React.FC = () => {
               </span>
             </div>
             
-            {/* 簡易警告・アドバイス */}
-            <div className="result-advice">
-              <span className={`${result.status}-badge`}>{result.advice}</span>
+            {/* 視認判定アラート */}
+            <div className={`result-advice-card result-${result.status}`}>
+              <div className="advice-badge">{result.advice}</div>
               <p className="result-reason-text">{result.reason}</p>
             </div>
           </div>
 
-          {/* 新設：判定基準ガイド */}
-          <div className="advice-guide-box">
-            <h4>💡 視認判定の基準値とNG範囲</h4>
-            <p className="guide-intro">
-              再帰反射シートは入射光を光源へ「コーン状（光錐）」に戻すため、以下の角度が大きくなると反射光は急激に弱まります。
-            </p>
-            <ul className="guide-list">
-              <li>
-                <strong>観測角 (α) [ライトと目の高低差]</strong>:
-                <ul>
-                  <li><code>0.2° 〜 0.33° (12′〜20′)</code>: <strong>最適（最高輝度）</strong>。遠方走行時。</li>
-                  <li><code>0.5° (30′) 超</code>: <strong>注意</strong>。大型車や近距離で発生し、輝度が大幅に減衰。</li>
-                  <li><code>1.2° (72′) 超</code>: <strong>NG（視認不可）</strong>。光錐から目が完全に外れ、標識が暗黒化。</li>
-                </ul>
-              </li>
-              <li>
-                <strong>入射角 (β) [光の差し込む傾き]</strong>:
-                <ul>
-                  <li><code>0° 〜 15°</code>: <strong>良好</strong>。正面に近い反射。</li>
-                  <li><code>20° 〜 35°</code>: <strong>注意</strong>。カーブ等の斜め受光。広角性シートが必要。</li>
-                  <li><code>40° 以上</code>: <strong>NG（全反射の喪失）</strong>。アクリル臨界角を超えて光が透過漏れし反射不能。</li>
-                </ul>
-              </li>
-            </ul>
+          {/* リアルタイム視認境界チェックシート */}
+          <div className="realtime-check-sheet">
+            <h4>📊 リアルタイム視認基準チェック</h4>
+            <div className="check-grid">
+              <div className={`check-item ${obsAngleDeg > 1.2 ? 'check-failed' : obsAngleDeg > 0.5 ? 'check-warning' : 'check-success'}`}>
+                <span className="check-icon">
+                  {obsAngleDeg > 1.2 ? '❌' : obsAngleDeg > 0.5 ? '⚠️' : '✅'}
+                </span>
+                <div className="check-details">
+                  <h5>観測角制限 (α ≦ 1.20°)</h5>
+                  <p>現在: <strong>{obsAngleDeg.toFixed(2)}°</strong> (限界 1.20° / 警告 0.50°)</p>
+                </div>
+              </div>
+              <div className={`check-item ${Math.abs(entranceAngle) >= 40 ? 'check-failed' : Math.abs(entranceAngle) >= 20 ? 'check-warning' : 'check-success'}`}>
+                <span className="check-icon">
+                  {Math.abs(entranceAngle) >= 40 ? '❌' : Math.abs(entranceAngle) >= 20 ? '⚠️' : '✅'}
+                </span>
+                <div className="check-details">
+                  <h5>入射角制限 (β ≦ 40.0°)</h5>
+                  <p>現在: <strong>{Math.abs(entranceAngle)}.0°</strong> (限界 40.0° / 警告 20.0°)</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="danger-zones-box">
+              <h5>🚨 危険（視認NG）になる条件範囲</h5>
+              <div className="danger-limits-table-wrapper">
+                <table className="danger-limits-table">
+                  <thead>
+                    <tr>
+                      <th>車両タイプ</th>
+                      <th>アイポイント差 (h)</th>
+                      <th>危険（視認NG）になる範囲</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className={carType === 'sedan' ? 'highlight-danger-row' : ''}>
+                      <td>乗用車/セダン</td>
+                      <td>0.6 m</td>
+                      <td>測定距離 <strong>{getDangerZoneLimit('sedan')}m 以下</strong> (α ＞ 1.2°)</td>
+                    </tr>
+                    <tr className={carType === 'suv' ? 'highlight-danger-row' : ''}>
+                      <td>SUV</td>
+                      <td>0.9 m</td>
+                      <td>測定距離 <strong>{getDangerZoneLimit('suv')}m 以下</strong> (α ＞ 1.2°)</td>
+                    </tr>
+                    <tr className={carType === 'truck' ? 'highlight-danger-row' : ''}>
+                      <td>大型トラック</td>
+                      <td>1.5 m</td>
+                      <td>測定距離 <strong>{getDangerZoneLimit('truck')}m 以下</strong> (α ＞ 1.2°)</td>
+                    </tr>
+                    <tr className={Math.abs(entranceAngle) >= 40 ? 'highlight-danger-row' : ''}>
+                      <td>すべての車種</td>
+                      <td>-</td>
+                      <td>入射角(β - シートの傾き) <strong>40° 以上</strong> (左右)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="danger-note">
+                ※ 距離が近づくほど、ライトと運転手の目の高低差による角度（観測角α）は<strong>広がります</strong>。
+                そのため、<strong>「近距離＝明るくて見えやすい」は間違い</strong>で、近すぎると再帰反射の有効光から目が外れて標識が消灯したように暗く見えなくなります（これがNGのメカニズムです）。
+              </p>
+            </div>
           </div>
+
         </div>
       </div>
     </div>

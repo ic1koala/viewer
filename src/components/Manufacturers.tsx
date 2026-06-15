@@ -25,7 +25,7 @@ export const Manufacturers: React.FC = () => {
       <div className="manufacturers-header">
         <h2 className="section-title">主要メーカー分析 ＆ 技術アカデミー</h2>
         <p className="section-subtitle">
-          再帰反射シート市場を独占する3大メーカーの徹底比較と、数式を用いた光学技術の深掘り学習が可能です。
+          再帰反射シート市場をリードする3大グローバルメーカーの製品ラインナップの網羅的解説と、幾何光学の数理を深く学習できます。
         </p>
       </div>
 
@@ -35,19 +35,19 @@ export const Manufacturers: React.FC = () => {
           className={`sub-tab-btn ${!academyMode ? 'active' : ''}`}
           onClick={() => setAcademyMode(false)}
         >
-          主要メーカー比較
+          🔍 主要メーカー比較・製品全カタログ
         </button>
         <button
           className={`sub-tab-btn ${academyMode ? 'active' : ''}`}
           onClick={() => setAcademyMode(true)}
         >
-          技術アカデミー (数理光学)
+          🎓 技術アカデミー (数理幾何光学)
         </button>
       </div>
 
       {!academyMode ? (
         <div className="mfr-layout">
-          {/* メーカー選択サイドバー（タブ） */}
+          {/* メーカー選択サイドバー */}
           <div className="mfr-sidebar">
             {manufacturersData.map((m) => (
               <button
@@ -63,7 +63,29 @@ export const Manufacturers: React.FC = () => {
 
           {/* メーカー詳細表示 */}
           <div className="mfr-detail-content animated fadeIn">
-            <h3 className="mfr-full-title">{selectedMfr.fullName}</h3>
+            <div className="mfr-header-row">
+              <h3 className="mfr-full-title">{selectedMfr.fullName}</h3>
+              <div className="mfr-links">
+                <a
+                  href={selectedMfr.officialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mfr-link-btn primary-link"
+                >
+                  🔗 日本公式サイトへ
+                </a>
+                {selectedMfr.globalUrl && (
+                  <a
+                    href={selectedMfr.globalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mfr-link-btn secondary-link"
+                  >
+                    🌐 Global Site
+                  </a>
+                )}
+              </div>
+            </div>
             
             {/* 特徴タグ */}
             <div className="mfr-meta-grid">
@@ -83,7 +105,7 @@ export const Manufacturers: React.FC = () => {
 
             {/* スペックレーティング */}
             <div className="specs-ratings-box">
-              <h4 className="box-title">性能レーティング (各社比)</h4>
+              <h4 className="box-title">性能レーティング (光学・物理特性の各社相対比較)</h4>
               <div className="ratings-grid">
                 <div className="rating-row">
                   <span className="rating-label">反射輝度 (Peak Brightness)</span>
@@ -116,13 +138,13 @@ export const Manufacturers: React.FC = () => {
 
             {/* 技術詳細 */}
             <div className="detail-section">
-              <h4 className="section-heading-small">核心技術: {selectedMfr.coreTech}</h4>
+              <h4 className="section-heading-small">核心となる特許光学技術: {selectedMfr.coreTech}</h4>
               <p className="section-body-text">{selectedMfr.coreTechDesc}</p>
             </div>
 
             {/* 主な強みリスト */}
             <div className="detail-section">
-              <h4 className="section-heading-small">製品の主な強み</h4>
+              <h4 className="section-heading-small">製品の主な強み・技術的メリット</h4>
               <ul className="bullet-list">
                 {selectedMfr.pros.map((pro, i) => (
                   <li key={i}>{pro}</li>
@@ -130,15 +152,43 @@ export const Manufacturers: React.FC = () => {
               </ul>
             </div>
 
-            {/* 代表製品 */}
+            {/* 網羅製品カタログ */}
             <div className="detail-section">
-              <h4 className="section-heading-small">代表的な製品ラインナップ</h4>
-              <div className="products-grid">
+              <h4 className="section-heading-small">全製品ラインナップ・詳細カタログ</h4>
+              <p className="section-intro-text">
+                以下は、{selectedMfr.name}が提供する公式のほぼすべての主要反射材料製品ラインナップです。用途、耐候年数、JIS/JIS相当の適合規格などの詳細情報を網羅しています。
+              </p>
+              
+              <div className="extended-products-list">
                 {selectedMfr.products.map((p, i) => (
-                  <div key={i} className="product-card">
-                    <span className="product-type-badge">{p.type}</span>
-                    <h5 className="product-name">{p.name}</h5>
-                    <p className="product-desc">{p.desc}</p>
+                  <div key={i} className="extended-product-card">
+                    <div className="card-top-info">
+                      <span className="prod-type-label">{p.type}</span>
+                      <span className="prod-lifespan-label">⏳ 耐候年数: <strong>{p.lifespan}</strong></span>
+                    </div>
+                    <h5 className="prod-name-title">{p.name}</h5>
+                    <div className="prod-model-num">型番・シリーズ: <code>{p.model}</code></div>
+                    <p className="prod-description-text">{p.desc}</p>
+                    
+                    <div className="prod-specs-sub-grid">
+                      <div className="spec-sub-item">
+                        <strong>適合規格:</strong> <span>{p.standards}</span>
+                      </div>
+                      {p.colorVariations && (
+                        <div className="spec-sub-item">
+                          <strong>主なカラー:</strong> <span>{p.colorVariations}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="prod-features-box">
+                      <strong>製品の光学・物理的特徴:</strong>
+                      <ul className="prod-features-bullet">
+                        {p.features.map((feat, idx) => (
+                          <li key={idx}>{feat}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -146,7 +196,7 @@ export const Manufacturers: React.FC = () => {
 
             {/* 特許情報 */}
             <div className="detail-section">
-              <h4 className="section-heading-small">保有する主要特許技術</h4>
+              <h4 className="section-heading-small">保有するコア特許技術</h4>
               <div className="patents-box">
                 {selectedMfr.patents.map((pat, i) => (
                   <div key={i} className="patent-item">
@@ -162,7 +212,7 @@ export const Manufacturers: React.FC = () => {
 
             {/* 主な導入先 */}
             <div className="detail-section">
-              <h4 className="section-heading-small">主な導入先・用途</h4>
+              <h4 className="section-heading-small">主な導入先・実用例</h4>
               <div className="apps-tag-wrapper">
                 {selectedMfr.applications.map((app, i) => (
                   <span key={i} className="app-tag">
@@ -199,16 +249,17 @@ export const Manufacturers: React.FC = () => {
                 <div className="formula-box">
                   <h5>スネルの法則 (Snell's Law)</h5>
                   <code>n₁ sin θ₁ = n₂ sin θ₂</code>
-                  <p className="formula-desc">異なる屈折率の境界を光が通過する際の基本法則。</p>
+                  <p className="formula-desc">異なる屈折率の境界を光が通過する際の屈折角を記述する基本物理法則。</p>
                 </div>
 
                 <div className="formula-box">
-                  <h5>球面屈折公式 (近軸近似)</h5>
-                  <code>n₁/s + n/s' = (n - n₁)/R</code>
+                  <h5>球面屈折公式 (近軸屈折)</h5>
+                  <code>n₁/s + n₂/s' = (n₂ - n₁)/R</code>
                   <p className="formula-desc">
-                    曲率半径 <code>R</code> の球面における像点距離 <code>s'</code> を求める式。
-                    平行光線（<code>s = ∞</code>）、外部媒質が空気（<code>n₁ = 1.0</code>）のとき、
-                    像がビーズの裏面（<code>s' = 2R</code>）に結ばれる条件は、屈折率が <strong>n = 2.0</strong> のときになります。
+                    曲率半径 <code>R</code> の球面境界における物点距離 <code>s</code> と像点距離 <code>s'</code> の関係式。
+                    無限遠（平行光線）から入射（<code>s = ∞</code>）、外部媒質が空気（<code>n₁ = 1.0</code>）、ビーズ屈折率を <code>n₂ = n</code> とすると、
+                    像がビーズの裏面（<code>s' = 2R</code>：直径の距離）にちょうどピントを結ぶ条件は、
+                    <code>1/∞ + n/(2R) = (n - 1)/R  ⇒  n/2 = n - 1  ⇒  <strong>n = 2.0</strong></code> となり、屈折率がジャスト2.0のとき完全に裏面反射膜上で結像して再帰反射効率が最大化されます。
                   </p>
                 </div>
 
@@ -216,10 +267,10 @@ export const Manufacturers: React.FC = () => {
                   <h5>実製品の屈折率補正</h5>
                   <ul>
                     <li>
-                      <strong>露出レンズ型:</strong> ビーズの上部が空気に直接触れているため、最適屈折率は理論値に近い <strong>n ≈ 2.2</strong> 程度に設計されます。
+                      <strong>露出レンズ型:</strong> ビーズの上半分が空気に直接触れているため、最適屈折率は理論値に近い <strong>n ≈ 1.9 〜 2.2</strong> に設計されます。
                     </li>
                     <li>
-                      <strong>封入レンズ型:</strong> ビーズの上部が透明樹脂（<code>n ≈ 1.5</code>）で覆われているため、屈折率比の計算からビーズ自体の最適屈折率は <strong>n ≈ 1.9</strong> になります。
+                      <strong>封入レンズ型:</strong> ビーズ上部が保護用の透明アクリル樹脂層（<code>n ≈ 1.5</code>）で覆われているため、境界の屈折率比が小さくなります。そのため、樹脂層からビーズ内への屈折で裏面に焦点を結ぶには、ビーズ自体の最適屈折率は <strong>n ≈ 1.9</strong> に補正されます。
                     </li>
                   </ul>
                 </div>
@@ -234,35 +285,37 @@ export const Manufacturers: React.FC = () => {
               </div>
               <div className="academy-card-body">
                 <p>
-                  コーナーキューブは、互いに直交する3つの鏡（x=0, y=0, z=0面）で構成されています。
+                  コーナーキューブは、互いに直交する3つの反射鏡面（x=0, y=0, z=0面）で構成されています。
                 </p>
 
                 <div className="formula-box">
                   <h5>鏡面反射の反射方程式</h5>
                   <code>{"u' = u - 2(u · n)n"}</code>
                   <p className="formula-desc">
-                    入射ベクトル <code>u</code>、面法線 <code>n</code> に対する反射後のベクトル <code>u'</code> の計算。
+                    入射光の単位ベクトル <code>u</code>、反射面の法線ベクトル <code>n</code> に対する反射後の光線ベクトル <code>u'</code> の計算。
                   </p>
                 </div>
 
                 <div className="formula-box">
-                  <h5>3回連続反射による反転ベクトル</h5>
+                  <h5>3回連続反射による完全反転証明</h5>
                   <div className="vector-steps">
-                    <div>1. 面 A (x=0) 反射: <code>{"u' = (-ux, uy, uz)"}</code></div>
-                    <div>2. 面 B (y=0) 反射: <code>{"u'' = (-ux, -uy, uz)"}</code></div>
-                    <div>3. 面 C (z=0) 反射: <code>{"u''' = (-ux, -uy, -uz)"}</code></div>
+                    <div>1. 面 X (法線 <code>nx = (1, 0, 0)</code>) で反射: <code>{"u' = (-ux, uy, uz)"}</code></div>
+                    <div>2. 面 Y (法線 <code>ny = (0, 1, 0)</code>) で反射: <code>{"u'' = (-ux, -uy, uz)"}</code></div>
+                    <div>3. 面 Z (法線 <code>nz = (0, 0, 1)</code>) で反射: <code>{"u''' = (-ux, -uy, -uz)"}</code></div>
                   </div>
                   <p className="formula-desc">
-                    結果として、最終的な反射光の方向ベクトルは <strong>{"u''' = -u"}</strong> となり、
-                    入射した光はどんな角度でも完全に光源方向へ戻ることが数理的に証明されます。
+                    各座標軸に対応する法線面で反射するたびに、ベクトルの各軸成分が1つずつマイナス反転し、
+                    最終的な反射光の方向ベクトルは <strong>{"u''' = -u"}</strong> となります。
+                    これにより、入射角がどのような角度であっても、光は必ず光源の座標へと完全に戻ります。
                   </p>
                 </div>
 
                 <div className="academy-comparison">
                   <h5>全反射 (Total Internal Reflection) 条件</h5>
                   <p>
-                    プリズムの背面は金属蒸着されておらず、アクリルなどの樹脂と外部の空気層との屈折率差を利用して100%全反射させています。
-                    臨界角 <code>θc = arcsin(1.0 / n_p)</code> を超える入射角の場合に全反射が成り立ちます。
+                    プリズム背面は金属蒸着されておらず、アクリル(PMMA)などの樹脂と裏面空気層との屈折率差を利用して100%全反射させています。
+                    アクリルの屈折率 <code>n_p ≈ 1.49</code> のとき、臨界角は <code>θc = arcsin(1.0 / 1.49) ≈ 42.1°</code> となり、
+                    これより大きな入射角でアクリルと空気の界面に到達した光が全反射します。入射角が40°を超えるとこの臨界角を維持できず光が外部に突き抜けてしまい、反射不能（NG）となります。
                   </p>
                 </div>
               </div>

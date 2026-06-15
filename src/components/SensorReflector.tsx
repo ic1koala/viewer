@@ -7,7 +7,7 @@ export const SensorReflector: React.FC = () => {
       <div className="manufacturers-header">
         <h2 className="section-title">光電センサー用リフレクタ技術</h2>
         <p className="section-subtitle">
-          FA（ファクトリーオートメーション）や自動化ラインの頭脳である光電センサーと、その性能を支える精密リフレクタ（反射板）の物理と製品情報を解説します。
+          FA（ファクトリーオートメーション）ラインの自動制御を支える「回帰反射形光電センサー」と、その受光性能を決定づける高精度リフレクタ（反射板）の物理構造および製品データベースです。
         </p>
       </div>
 
@@ -16,24 +16,47 @@ export const SensorReflector: React.FC = () => {
         <div className="reflector-intro-text">
           <h3>回帰反射形光電センサーの仕組み</h3>
           <p>
-            回帰反射形センサー（Retro-reflective Sensor）は、**「投光部」**と**「受光部」**が一体となったセンサーボディと、対向して設置される**「リフレクタ（反射板）」**で構成されます。
+            回帰反射形センサー（Retro-reflective Sensor）は、ひとつのハウジング内に**「投光素子（赤色LEDやレーザー）」**と**「受光素子（フォトダイオード等）」**を隣接して配置したセンサーボディと、対向して設置される**「リフレクタ（反射板）」**を対にして使用します。
           </p>
           <p>
-            センサーから発せられた光線（赤色LEDやレーザーなど）がリフレクタで再帰反射して受光部に戻ることで、光路が維持されます。
-            ここに検出物体（パレットやワークなど）が割り込むと、光が遮られて受光量が低下し、物体の通過や有無を高速検知します。
+            センサーが投射したビームがリフレクタで正確に再帰反射して受光素子に戻ることで光路が作られます。
+            検出物体（ワークやパレット等）がこの光路を遮ると、受光量が低下し、センサーは「遮光状態（物体検出あり）」の信号を制御装置（PLC）へ高速出力します。
+            投受光器を対向して2台設置し配線する「透過形」に比べ、<strong>配線が片側だけで済み、設置工数を大幅に削減できる</strong>のが最大の強みです。
           </p>
           
           <div className="polarization-card">
             <h4>💡 鏡面光沢物の誤検出を防ぐ「偏光特性 (M.S.R.機能)」</h4>
             <p>
-              光沢のある金属や鏡のようなワークがセンサー前を通過すると、ワーク表面で鏡面反射（正反射）した光がセンサーの受光部に入ってしまい、「遮光されているのに光が戻ってきているため、物体なし」と誤判定する問題が生じます。
+              光沢のある金属（缶、アルミパレット）やプラスチック容器などの鏡面（正反射物）がセンサーの目の前を通過すると、ワーク表面で鏡面反射した強い光が受光部に戻ってしまいます。
+              このときセンサーは「光が戻ってきているため、物体は存在しない」と誤検出してしまう致命的な弱点が生じます。
             </p>
             <p>
-              これを防ぐのが**M.S.R. (Mirror Surface Rejection) 機能**です。
-              投光部に横方向の偏光フィルタ、受光部に縦方向の偏光フィルタを配置します。
-              通常の光沢物による鏡面反射では偏光方向は変わりませんが、<strong>リフレクタ（直交三面鏡コーナーキューブ）で3回全反射した光は、偏光波が幾何学的に90度回転して縦方向の偏光</strong>となります。
-              これにより、リフレクタからの戻り光だけを受光部が通し、ワークからの反射光はシャットアウトして誤検出を完全に防止します。
+              この問題を幾何光学的に完全に解決するのが、<strong>M.S.R. (Mirror Surface Rejection：鏡面干渉除去) 機能</strong>です。
             </p>
+            
+            <div className="msr-steps-box">
+              <h5>【M.S.R.機能のステップ別動作原理】</h5>
+              <ol className="msr-steps-list">
+                <li>
+                  <strong>横偏光の投光:</strong>
+                  投光素子の前面に偏光フィルターを配置し、光の電気ベクトルが「横方向」にしか振動しない偏光波（S偏光）としてビームを照射します。
+                </li>
+                <li>
+                  <strong>ワーク（鏡面光沢物）での正反射:</strong>
+                  ワークの滑らかな表面で正反射した光は、偏光の規則性が変わらずに<strong>「横偏光（S偏光）」のまま</strong>受光部へ戻ります。
+                </li>
+                <li>
+                  <strong>リフレクタ（直交三面鏡）での再帰反射:</strong>
+                  リフレクタ（コーナーキューブプリズム）の互いに直交する3つの境界壁面で光が3回全反射すると、幾何光学的な境界条件から、電場ベクトルが反転し、<strong>偏光方向がちょうど90度回転した「縦偏光（P偏光）」</strong>としてセンサーへ戻ります。
+                </li>
+                <li>
+                  <strong>受光部偏光フィルターによる選別:</strong>
+                  受光素子の前面には「縦方向」の偏光波しか通さないフィルターを配置します。
+                  これにより、<strong>ワークからの鏡面反射（横偏光）はフィルターに遮断されて受光できず、リフレクタからの戻り光（縦偏光）だけが通過</strong>して受光されます。
+                  結果として、光沢のある缶やペットボトルが光路を塞いだときも、誤検出なく「遮光（物体あり）」と判定できます。
+                </li>
+              </ol>
+            </div>
           </div>
         </div>
         
@@ -43,14 +66,18 @@ export const SensorReflector: React.FC = () => {
             alt="光電センサーとリフレクタの動作原理イラスト"
             className="reflector-concept-img"
           />
-          <span className="image-caption">回帰反射形光電センサーとリフレクタの光線路（イメージ図）</span>
+          <span className="image-caption">回帰反射形光電センサーとリフレクタの光線路（M.S.R.機能イメージ図）</span>
         </div>
       </div>
 
       <div className="section-divider"></div>
 
       {/* 各社製品ラインナップ */}
-      <h3 className="home-section-title">主要メーカーのリフレクタ製品ラインナップ</h3>
+      <h3 className="home-section-title">主要メーカーのセンサー用リフレクタ製品カタログ</h3>
+      <p className="section-intro-text">
+        FAで多用される主要な成形リフレクタおよびマイクロプリズムシート製品です。センサーのレーザー・LED径、取付スペースに合わせて選定されます。詳細仕様は各公式リンクから確認できます。
+      </p>
+      
       <div className="reflector-products-grid">
         {sensorReflectorData.map((prod) => (
           <div key={prod.id} className="reflector-product-card">
@@ -70,12 +97,22 @@ export const SensorReflector: React.FC = () => {
             </div>
             <p className="prod-description">{prod.description}</p>
             <div className="features-list-wrapper">
-              <h5>主な特徴・技術:</h5>
+              <h5>主な特徴・光学性能:</h5>
               <ul className="bullet-list-small">
                 {prod.features.map((feat, i) => (
                   <li key={i}>{feat}</li>
                 ))}
               </ul>
+            </div>
+            <div className="reflector-card-action">
+              <a
+                href={prod.officialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="reflector-link-btn"
+              >
+                🔗 公式製品サイトで確認する →
+              </a>
             </div>
           </div>
         ))}
@@ -85,7 +122,7 @@ export const SensorReflector: React.FC = () => {
 
       {/* センサー用リフレクタと標識用シートの設計の違い */}
       <div className="academy-comparison-table-box">
-        <h4 className="table-title">道路標識用シート vs センサー用リフレクタ 徹底比較</h4>
+        <h4 className="table-title">道路標識用反射シート vs センサー用リフレクタ 徹底比較</h4>
         <table className="comparison-table">
           <thead>
             <tr>

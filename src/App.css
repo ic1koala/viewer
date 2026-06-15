@@ -1998,3 +1998,414 @@
   border-color: var(--text-muted);
   transform: translateY(-2px);
 }
+
+/* ==========================================================================
+   EXTENDED MANUFACTURERS AND SIMULATOR CHECK SHEET STYLES
+   ========================================================================== */
+
+/* メーカー詳細の公式サイトリンクボタン */
+.mfr-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.mfr-links {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.mfr-link-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.mfr-link-btn.primary-link {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
+}
+
+.mfr-link-btn.primary-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(14, 165, 233, 0.3);
+}
+
+.mfr-link-btn.secondary-link {
+  background: #f1f5f9;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.mfr-link-btn.secondary-link:hover {
+  background: #e2e8f0;
+  transform: translateY(-2px);
+}
+
+/* 拡張された製品カタログ */
+.mfr-intro-text {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.extended-products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.extended-product-card {
+  background: #ffffff;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.01);
+  transition: var(--transition-smooth);
+}
+
+.extended-product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+  border-color: #bae6fd;
+}
+
+.card-top-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.prod-type-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #0284c7;
+  background: rgba(14, 165, 233, 0.08);
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.prod-lifespan-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.prod-name-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.prod-model-num {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+}
+
+.prod-description-text {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.prod-specs-sub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  background: #f8fafc;
+  padding: 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+  .prod-specs-sub-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.spec-sub-item strong {
+  color: var(--text-primary);
+  margin-right: 0.4rem;
+}
+
+.spec-sub-item span {
+  color: var(--text-secondary);
+}
+
+.prod-features-box {
+  border-top: 1px dashed var(--border-color);
+  padding-top: 0.8rem;
+  font-size: 0.85rem;
+}
+
+.prod-features-box strong {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--text-primary);
+}
+
+.prod-features-bullet {
+  list-style-type: disc;
+  margin-left: 1.2rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* リアルタイム視認境界チェックシート (Simulator用) */
+.realtime-check-sheet {
+  background: #ffffff;
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.01);
+}
+
+.realtime-check-sheet h4 {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.check-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .check-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  transition: var(--transition-smooth);
+}
+
+.check-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.check-details h5 {
+  font-size: 0.9rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+
+.check-details p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.check-success {
+  background: rgba(34, 197, 94, 0.04);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+.check-success h5 { color: #166534; }
+
+.check-warning {
+  background: rgba(234, 179, 8, 0.04);
+  border-color: rgba(234, 179, 8, 0.2);
+}
+.check-warning h5 { color: #854d0e; }
+
+.check-failed {
+  background: rgba(239, 68, 68, 0.04);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+.check-failed h5 { color: #991b1b; }
+
+.danger-zones-box {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-top: 1rem;
+}
+
+.danger-zones-box h5 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.8rem;
+}
+
+.danger-limits-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 0.8rem;
+}
+
+.danger-limits-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.danger-limits-table th, 
+.danger-limits-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.danger-limits-table th {
+  font-weight: 700;
+  color: var(--text-primary);
+  background: #f1f5f9;
+}
+
+.danger-limits-table td {
+  color: var(--text-secondary);
+}
+
+.highlight-danger-row {
+  background: rgba(239, 68, 68, 0.08) !important;
+  font-weight: bold;
+}
+.highlight-danger-row td {
+  color: #991b1b !important;
+}
+
+.danger-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 0.4rem;
+}
+
+/* 動的なシミュレータ結果表示カード */
+.result-advice-card {
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+  border: 1px solid transparent;
+}
+
+.result-advice-card .advice-badge {
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+
+.result-advice-card .result-reason-text {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.result-ok {
+  background: rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.2);
+  color: #166534;
+}
+
+.result-warn {
+  background: rgba(234, 179, 8, 0.05);
+  border-color: rgba(234, 179, 8, 0.2);
+  color: #854d0e;
+}
+
+.result-ng {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #991b1b;
+  animation: pulse-danger-border 2s infinite ease-in-out;
+}
+
+@keyframes pulse-danger-border {
+  0%, 100% { border-color: rgba(239, 68, 68, 0.2); }
+  50% { border-color: rgba(239, 68, 68, 0.6); }
+}
+
+/* 偏光 M.S.R 技術解説ボックス */
+.msr-steps-box {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-top: 1rem;
+}
+
+.msr-steps-box h5 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.8rem;
+}
+
+.msr-steps-list {
+  list-style-type: decimal;
+  margin-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.msr-steps-list li {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.msr-steps-list li strong {
+  color: var(--text-primary);
+}
+
+/* センサー用リフレクタリンクボタン */
+.reflector-card-action {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border-color);
+  text-align: right;
+}
+
+.reflector-link-btn {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0284c7;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.reflector-link-btn:hover {
+  color: #0369a1;
+  transform: translateX(3px);
+}
