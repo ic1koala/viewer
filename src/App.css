@@ -2341,9 +2341,20 @@
 }
 
 .prod-model-num {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #000000;
   margin-bottom: 0.8rem;
+}
+
+.prod-model-num code {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #000000;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
 }
 
 .prod-description-text {
