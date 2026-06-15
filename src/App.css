@@ -1999,6 +1999,233 @@
   transform: translateY(-2px);
 }
 
+/* クイズ・スタート画面とやり直し機能の拡張スタイル */
+.quiz-start-screen {
+  max-width: 750px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.quiz-start-card {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.start-badge {
+  align-self: flex-start;
+  background: rgba(14, 165, 233, 0.08);
+  color: #0ea5e9;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border-radius: 9999px;
+  border: 1px solid rgba(14, 165, 233, 0.15);
+}
+
+.quiz-start-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.start-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.wrong-questions-tracker {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tracker-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tracker-icon {
+  font-size: 1.2rem;
+}
+
+.tracker-header h4 {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.wrong-questions-tracker p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.tracker-progress {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.tracker-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f43f5e, #ec4899);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.tracker-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.quiz-start-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .quiz-start-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.quiz-start-btnprimary {
+  font-family: var(--font-heading);
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  border: none;
+  color: white;
+  padding: 1rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.25);
+  transition: var(--transition-smooth);
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.quiz-start-btnprimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35);
+}
+
+.quiz-start-btnsecondary {
+  font-family: var(--font-heading);
+  background: white;
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 1rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.quiz-start-btnsecondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: var(--text-muted);
+  transform: translateY(-2px);
+}
+
+.quiz-start-btnsecondary.btn-disabled {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: var(--text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.disabled-btn-guide {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: -0.5rem;
+}
+
+/* クイズ実行中のモード表示 */
+.mode-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: 9999px;
+  margin-right: 0.8rem;
+  vertical-align: middle;
+}
+
+.normal-mode {
+  background: rgba(14, 165, 233, 0.08);
+  color: #0ea5e9;
+  border: 1px solid rgba(14, 165, 233, 0.15);
+}
+
+.review-mode {
+  background: rgba(244, 63, 94, 0.08);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.15);
+}
+
+/* 結果画面のアクションボタン */
+.result-actions {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.quiz-start-screen-btn {
+  font-family: var(--font-heading);
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border: none;
+  padding: 0.85rem 2.2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.25);
+  transition: var(--transition-smooth);
+}
+
+.quiz-start-screen-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35);
+}
+
+.rank-normal {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.05);
+}
+.rank-normal .rank-title {
+  color: #0284c7;
+}
+
 /* ==========================================================================
    EXTENDED MANUFACTURERS AND SIMULATOR CHECK SHEET STYLES
    ========================================================================== */
